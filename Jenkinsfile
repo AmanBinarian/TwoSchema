@@ -82,18 +82,16 @@ pipeline {
                 bat "docker build -t springbootdocker -f Dockerfile.txt ."
             }
         }
-      stage('Login to AWS ECR') { 
+        
+       stage('Login to AWS ECR') { 
             steps { 
-                echo "Logging in to AWS ECR"
-                script { 
+               script { 
                     withCredentials([usernamePassword(credentialsId: 'aws-credentials', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) { 
-                        bat '''
-                        for /f "tokens=* usebackq" %%p in (`aws ecr get-login-password --region ap-south-1`) do docker login --username AWS --password %%p 495599778842.dkr.ecr.ap-south-1.amazonaws.com
-                        '''
+                        bat "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}" 
                     } 
                 } 
             } 
-      }
+        } 
         stage('Push Docker Image to AWS ECR') { 
             steps { 
                 script { 
