@@ -26,6 +26,11 @@ pipeline {
                      -o issues.json
                 '''
 
+                echo "Downloading template.html from GitHub..."
+                bat '''
+                curl -L -o template.html "https://raw.githubusercontent.com/AmanBinarian/Employees/main/template.html"
+                '''
+
                 echo "Processing JSON data..."
                 powershell '''
                 try {
@@ -63,14 +68,12 @@ pipeline {
             }
         }
 
-      stage('Build Docker Image') {
-          steps {
-              echo "Running the docker file "
-              script {
-                 bat "docker build -t springbootdocker -f Dockerfile.txt ."
-              }
-           }
-       }
+        stage('Build Docker Image') {
+            steps {
+                echo "Building Docker Image..."
+                bat "docker build -t springbootdocker -f Dockerfile.txt ."
+            }
+        }
 
         stage('Send Email') {
             steps {
@@ -83,8 +86,8 @@ pipeline {
                     $message = New-Object System.Net.Mail.MailMessage
                     $message.From = "studyproject9821@gmail.com"
                     $message.To.Add("supradip.majumdar@binarysemantics.com")
-                    $message.Subject = "Codacy Issues Report"
-                    $message.Body = "Attached is the Codacy issues report with error and warning analysis."
+                    $message.Subject = "LGI Report: Codacy Issues Summary"
+                    $message.Body = "Dear Team,`n`nPlease find the attached LGI Report containing the Codacy issues analysis.`n`nBest Regards,`nLGI Team"
 
                     @("codacy_issues.txt", "error_warning_count.txt", "chart.html") | ForEach-Object {
                         $message.Attachments.Add((New-Object System.Net.Mail.Attachment($_)))
