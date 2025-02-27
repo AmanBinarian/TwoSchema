@@ -89,7 +89,7 @@ pipeline {
                echo "Testing aws cli"
                withAWS(credentials: 'aws-credentials-id', region: 'ap-south-1') {      
                    echo "Inside Aws Credentials"
-                   "C:\Program Files\Amazon\AWSCLIV2\aws.exe" s3 ls                
+                   bat "aws s3 ls"                
                }             
            }        
        }   
