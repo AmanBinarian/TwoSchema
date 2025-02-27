@@ -85,26 +85,19 @@ pipeline {
         }
         
 
-      stage('AWS CLI Test') {             
-           steps {    
-               echo "Testing aws cli"
-               withAWS(credentials: 'aws-credentials-id', region: 'ap-south-1') {      
-                   echo "Inside Aws Credentials"
-                   bat "${AWS_CLI_PATH} s3 ls"                
-               }             
-           }        
-       }   
+    
        
        stage('Login to AWS ECR') { 
             steps { 
                script { 
                     withCredentials([usernamePassword(credentialsId: 'aws-credentials', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) { 
                         echo "Inisde Aws Login ECr"
-                        bat "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}" 
+                        bat "${AWS_CLI_PATH} ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}" 
                     } 
                 } 
             } 
         } 
+
         stage('Push Docker Image to AWS ECR') { 
             steps { 
                 script { 
