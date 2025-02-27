@@ -108,7 +108,6 @@ pipeline {
                 } 
             } 
         } 
-    }
         
         stage('Send Email') {
             steps {
