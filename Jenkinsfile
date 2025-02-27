@@ -83,6 +83,7 @@ pipeline {
             }
         }
  stage('Login to AWS ECR') { 
+
             steps { 
                 echo "Logging in to AWS ECR"
                 script { 
@@ -103,6 +104,7 @@ pipeline {
 
         stage('Push Docker Image to AWS ECR') { 
             steps { 
+                echo "Pushing Docker Image to Aws ECR"
                 script { 
                     bat "docker push ${DOCKER_IMAGE}" 
                 } 
