@@ -84,7 +84,8 @@ pipeline {
         }
         
        stage('AWS CLI Test') {             
-           steps {                 
+           steps {    
+               echo "Testing aws"
                withAWS(credentials: 'aws-credentials-id', region: 'ap-south-1') {                     
                    bat "aws s3 ls"                 
                }             
