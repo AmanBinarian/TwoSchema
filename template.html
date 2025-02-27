@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+        google.charts.load('current', {'packages':['corechart']});
+        google.charts.setOnLoadCallback(drawChart);
+
+        function drawChart() {
+            var data = google.visualization.arrayToDataTable([
+                ['Category', 'Count'],
+                ['Errors', {{ERROR_COUNT}}],
+                ['Warnings', {{WARNING_COUNT}}]
+            ]);
+
+            var options = {
+                title: 'Error vs Warning Distribution',
+                pieHole: 0.4,
+                colors: ['#FF0000', '#FFA500'], // Red for Errors, Orange for Warnings
+                legend: { position: 'bottom' }
+            };
+
+            var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+            chart.draw(data, options);
+        }
+    </script>
+</head>
+<body>
+    <h2>Codacy Issues Report</h2>
+    <p>Errors: {{ERROR_COUNT}}</p>
+    <p>Warnings: {{WARNING_COUNT}}</p>
+    <div id="piechart" style="width: 600px; height: 400px;"></div>
+</body>
+</html>
