@@ -1,4 +1,4 @@
- pipeline {
+pipeline {
     agent any
 
     environment {
@@ -83,7 +83,17 @@
             }
         }
         
- 
+
+      stage('AWS CLI Test') {             
+           steps {    
+               echo "Testing aws cli"
+               withAWS(credentials: 'aws-credentials-id', region: 'ap-south-1') {      
+                   echo "Inside Aws Credentials"
+                   "C:\Program Files\Amazon\AWSCLIV2\aws.exe" s3 ls                
+               }             
+           }        
+       }   
+       
        stage('Login to AWS ECR') { 
             steps { 
                script { 
