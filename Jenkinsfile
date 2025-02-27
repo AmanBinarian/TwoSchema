@@ -93,7 +93,6 @@ pipeline {
                     } 
                 } 
             } 
-        } 
 
         stage('Push Docker Image to AWS ECR') { 
             steps { 
