@@ -65,6 +65,7 @@ pipeline {
 
       stage('Build Docker Image') {
           steps {
+              echo "Running the docker file "
               script {
                  bat "docker build -t springbootdocker -f Dockerfile.txt ."
               }
