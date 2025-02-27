@@ -83,38 +83,24 @@ pipeline {
             }
         }
  stage('Login to AWS ECR') { 
-
             steps { 
-
+                echo "Logging in to AWS ECR"
                 script { 
-
                     withCredentials([usernamePassword(credentialsId: 'aws-credentials', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) { 
-
-                        sh "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}" 
-
+                        bat "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}" 
                     } 
-
                 } 
-
             } 
-
         } 
-
- 
 
         stage('Push Docker Image to AWS ECR') { 
-
             steps { 
-
                 script { 
-
                     sh "docker push ${DOCKER_IMAGE}" 
-
                 } 
-
             } 
-
         } 
+        
         stage('Send Email') {
             steps {
                 powershell '''
