@@ -4,6 +4,14 @@ pipeline {
     environment {
         CODACY_API_TOKEN   = credentials('codacy-token')
         GMAIL_APP_PASSWORD = credentials('app-password')
+        AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY_ID')
+        AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
+        AWS_REGION = credentials('AWS_REGION')
+        AWS_ACCOUNT_ID = '495599778842' 
+        ECR_REPOSITORY = 'my-app' 
+        IMAGE_TAG = "${BUILD_NUMBER}" 
+        ECR_REGISTRY = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com" 
+        DOCKER_IMAGE = "${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}" 
     }
 
     stages {
@@ -74,7 +82,39 @@ pipeline {
                 bat "docker build -t springbootdocker -f Dockerfile.txt ."
             }
         }
+ stage('Login to AWS ECR') { 
 
+            steps { 
+
+                script { 
+
+                    withCredentials([usernamePassword(credentialsId: 'aws-credentials', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) { 
+
+                        sh "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}" 
+
+                    } 
+
+                } 
+
+            } 
+
+        } 
+
+ 
+
+        stage('Push Docker Image to AWS ECR') { 
+
+            steps { 
+
+                script { 
+
+                    sh "docker push ${DOCKER_IMAGE}" 
+
+                } 
+
+            } 
+
+        } 
         stage('Send Email') {
             steps {
                 powershell '''
