@@ -63,13 +63,7 @@ pipeline {
             }
         }
 
-      stage('Build Docker Image') {
-          steps {
-              script {
-                 bat "docker build -t springbootdocker -f dockerfile.txt ."
-              }
-           }
-       }
+     
 
         stage('Send Email') {
             steps {
