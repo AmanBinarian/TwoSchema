@@ -80,7 +80,7 @@ pipeline {
 
                     $message = New-Object System.Net.Mail.MailMessage
                     $message.From = "studyproject9821@gmail.com"
-                    $message.To.Add("supradip.majumdar@binarysemantics.com")
+                    $message.To.Add("aman.kumar@binarysemantics.com")
                     $message.Subject = "Codacy Issues Report"
                     $message.Body = "Attached is the Codacy issues report with error and warning analysis."
 
