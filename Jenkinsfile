@@ -67,7 +67,7 @@ curl -X POST ^
                    "@
                    }
 
-$output = $output -join "`n"
+                 $output = $output -join "`n"
 
                        # Bar Graph Part
                         
