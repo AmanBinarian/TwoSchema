@@ -77,27 +77,46 @@ pipeline {
             }
         }
 
- stage('Send Email') {
+        
+   stage('Send Email') {
             steps {
                 powershell '''
                 try {
-                    $smtp = New-Object Net.Mail.SmtpClient("smtp.gmail.com", 587)
-                    $smtp.EnableSsl = $true
-                    $smtp.Credentials = New-Object System.Net.NetworkCredential("studyproject9821@gmail.com", $env:GMAIL_APP_PASSWORD)
+                    $smtpServer = "smtp.gmail.com"
+                    $smtpPort = 587
+                    $smtpUser = "studyproject9821@gmail.com"
+                    $smtpPass = $env:GMAIL_APP_PASSWORD
 
+                    $from = "studyproject9821@gmail.com"
+                    $to = "aman.kumar@binarysemantics.com"
+                    $subject = "LGI Report : Codacy Issues Report"
+                    $body = "Attached is the Codacy issues report with error and warning analysis.\n\nDownload the HTML file to see the detailed report of errors and warnings in the form of a pie chart."
+
+                    # Attachments
+                    $attachments = @("codacy_issues.txt", "error_warning_count.txt", "chart.html")
+
+                    # Create Mail Message Object
                     $message = New-Object System.Net.Mail.MailMessage
-                    $message.From = "studyproject9821@gmail.com"
-                    $message.To.Add("supradip.majumdar@binarysemantics.com")
-                    $message.Subject = "LGI Report: Codacy Issues Summary"
-                    $message.Body = "Dear Team,`n`nPlease find the attached LGI Report containing the Codacy issues analysis.`n`nBest Regards,`nLGI Team"
+                    $message.From = $from
+                    $message.To.Add($to)
+                    $message.Subject = $subject
+                    $message.Body = $body
 
-                    @("codacy_issues.txt", "error_warning_count.txt", "chart.html") | ForEach-Object {
-                        $message.Attachments.Add((New-Object System.Net.Mail.Attachment($_)))
+                    foreach ($file in $attachments) {
+                        $message.Attachments.Add((New-Object System.Net.Mail.Attachment($file)))
                     }
 
+                    # Configure SMTP Client
+                    $smtp = New-Object Net.Mail.SmtpClient($smtpServer, $smtpPort)
+                    $smtp.EnableSsl = $true
+                    $smtp.Credentials = New-Object System.Net.NetworkCredential($smtpUser, $smtpPass)
+
+                    # Send Email
                     $smtp.Send($message)
+
                     Write-Host "Email sent successfully."
-                } catch {
+                }
+                catch {
                     Write-Host "ERROR: Failed to send email."
                     Write-Host $_
                     exit 1
@@ -111,38 +130,6 @@ pipeline {
                 archiveArtifacts artifacts: 'codacy_issues.txt, issues.json, error_warning_count.txt, chart.html', fingerprint: true
             }
         }
-        
-        stage('Build Docker Image') {
-            steps {
-                echo "Building Docker Image..."
-                bat "docker build -t ${DOCKER_IMAGE} -f Dockerfile.txt ."
-            }
-        }
-        
-
-    
-       
-       stage('Login to AWS ECR') { 
-            steps { 
-               script { 
-                    withCredentials([usernamePassword(credentialsId: 'aws-credentials', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) { 
-                        echo "Inisde Aws Login ECr"
-                        bat "${AWS_CLI_PATH} ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}" 
-                        echo "login succedded to ecr successfully " 
-                    } 
-                } 
-            } 
-        } 
-
-        stage('Push Docker Image to AWS ECR') { 
-            steps { 
-                echo "Pushing Docker Images to ECR " 
-                script { 
-                    bat "docker push ${DOCKER_IMAGE}" 
-                } 
-            } 
-        } 
-          
     }
 }
 
