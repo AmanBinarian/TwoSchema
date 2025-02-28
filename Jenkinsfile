@@ -56,13 +56,18 @@ curl -X POST ^
                     $errorCount = 0
                     $warningCount = 0
 
-                    foreach ($issue in $json.data) {
-                        $output += "Issue ID: $($issue.issueId)"
-                        $output += "Message: $($issue.message)"
-                        $output += "File Path: $($issue.filePath)"
-                        $output += "Severity Level: $($issue.patternInfo.severityLevel)"
-                        $output += "Sub Category: $($issue.patternInfo.subCategory)"
-                        $output += "--------------------------------------"
+                  $output = foreach ($issue in $json.data) {
+                   @"
+                    Issue ID: $($issue.issueId)
+                    Message: $($issue.message)
+                    File Path: $($issue.filePath)
+                    Severity Level: $($issue.patternInfo.severityLevel)
+                    Sub Category: $($issue.patternInfo.subCategory)
+                    --------------------------------------
+                   "@
+                   }
+
+$output = $output -join "`n"
 
                        # Bar Graph Part
                         
