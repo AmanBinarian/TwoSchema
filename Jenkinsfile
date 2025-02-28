@@ -80,7 +80,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 echo "Building Docker Image..."
-                bat "docker build -t springbootdocker -f Dockerfile.txt ."
+                bat "docker build -t ${DOCKER_IMAGE} -f Dockerfile.txt ."
             }
         }
         
@@ -93,7 +93,7 @@ pipeline {
                     withCredentials([usernamePassword(credentialsId: 'aws-credentials', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) { 
                         echo "Inisde Aws Login ECr"
                         bat "${AWS_CLI_PATH} ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}" 
-                      
+                         
                     } 
                 } 
             } 
