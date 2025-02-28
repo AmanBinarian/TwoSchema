@@ -56,27 +56,21 @@ curl -X POST ^
                     $errorCount = 0
                     $warningCount = 0
 
-                # Process JSON data
-                  $output = $json.data | ForEach-Object {
-                     "Issue ID: $($_.issueId)`n" +
-                     "Message: $($_.message)`n" +
-                     "File Path: $($_.filePath)`n" +
-                     "Severity Level: $($_.patternInfo.severityLevel)`n" +
-                     "Sub Category: $($_.patternInfo.subCategory)`n" +
-                     "--------------------------------------`n"
-                     }
+               # Process JSON data
+$output = $json.data | ForEach-Object {
+    if ($_.patternInfo.severityLevel -eq "Error") {
+        $errorCount++
+    } elseif ($_.patternInfo.severityLevel -eq "Warning") {
+        $warningCount++
+    }
 
-                # Join the array into a single string
-                  $output = $output -join "`n"
-
-
-                       # Bar Graph Part
-                        
-                        if ($issue.patternInfo.severityLevel -eq "Error") {
-                            $errorCount++
-                        } elseif ($issue.patternInfo.severityLevel -eq "Warning") {
-                            $warningCount++
-                        }
+    "Issue ID: $($_.issueId)`n" +
+    "Message: $($_.message)`n" +
+    "File Path: $($_.filePath)`n" +
+    "Severity Level: $($_.patternInfo.severityLevel)`n" +
+    "Sub Category: $($_.patternInfo.subCategory)`n" +
+    "--------------------------------------`n"
+}
                     }
 
                     # Save issue details
