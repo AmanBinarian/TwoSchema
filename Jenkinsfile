@@ -6,7 +6,7 @@ pipeline {
         GMAIL_APP_PASSWORD = credentials('app-password')
         AWS_ACCESS_KEY_ID = credentials('AWS_ACCESS_KEY_ID')
         AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
-        AWS_REGION = credentials('AWS_REGION')
+        AWS_REGION = 'ap-south-1'
         AWS_ACCOUNT_ID = '495599778842' 
         ECR_REPOSITORY = 'my-app' 
         IMAGE_TAG = "${BUILD_NUMBER}" 
