@@ -77,38 +77,7 @@ pipeline {
             }
         }
 
-        stage('Build Docker Image') {
-            steps {
-                echo "Building Docker Image..."
-                bat "docker build -t ${DOCKER_IMAGE} -f Dockerfile.txt ."
-            }
-        }
-        
-
-    
-       
-       stage('Login to AWS ECR') { 
-            steps { 
-               script { 
-                    withCredentials([usernamePassword(credentialsId: 'aws-credentials', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) { 
-                        echo "Inisde Aws Login ECr"
-                        bat "${AWS_CLI_PATH} ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}" 
-                        echo "login succedded to ecr successfully " 
-                    } 
-                } 
-            } 
-        } 
-
-        stage('Push Docker Image to AWS ECR') { 
-            steps { 
-                echo "Pushing Docker Images to ECR " 
-                script { 
-                    bat "docker push ${DOCKER_IMAGE}" 
-                } 
-            } 
-        } 
-        
-        stage('Send Email') {
+ stage('Send Email') {
             steps {
                 powershell '''
                 try {
@@ -142,6 +111,38 @@ pipeline {
                 archiveArtifacts artifacts: 'codacy_issues.txt, issues.json, error_warning_count.txt, chart.html', fingerprint: true
             }
         }
+        
+        stage('Build Docker Image') {
+            steps {
+                echo "Building Docker Image..."
+                bat "docker build -t ${DOCKER_IMAGE} -f Dockerfile.txt ."
+            }
+        }
+        
+
+    
+       
+       stage('Login to AWS ECR') { 
+            steps { 
+               script { 
+                    withCredentials([usernamePassword(credentialsId: 'aws-credentials', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) { 
+                        echo "Inisde Aws Login ECr"
+                        bat "${AWS_CLI_PATH} ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}" 
+                        echo "login succedded to ecr successfully " 
+                    } 
+                } 
+            } 
+        } 
+
+        stage('Push Docker Image to AWS ECR') { 
+            steps { 
+                echo "Pushing Docker Images to ECR " 
+                script { 
+                    bat "docker push ${DOCKER_IMAGE}" 
+                } 
+            } 
+        } 
+          
     }
 }
 
