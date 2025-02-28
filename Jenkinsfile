@@ -71,7 +71,6 @@ $output = $json.data | ForEach-Object {
     "Sub Category: $($_.patternInfo.subCategory)`n" +
     "--------------------------------------`n"
 }
-                    }
 
                     # Save issue details
                     $output | Out-File -Encoding UTF8 codacy_issues.txt
