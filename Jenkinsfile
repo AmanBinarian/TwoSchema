@@ -58,16 +58,16 @@ curl -X POST ^
 
                 # Process JSON data
                   $output = $json.data | ForEach-Object {
-    "Issue ID: $($_.issueId)`n" +
-    "Message: $($_.message)`n" +
-    "File Path: $($_.filePath)`n" +
-    "Severity Level: $($_.patternInfo.severityLevel)`n" +
-    "Sub Category: $($_.patternInfo.subCategory)`n" +
-    "--------------------------------------`n"
-}
+                     "Issue ID: $($_.issueId)`n" +
+                     "Message: $($_.message)`n" +
+                     "File Path: $($_.filePath)`n" +
+                     "Severity Level: $($_.patternInfo.severityLevel)`n" +
+                     "Sub Category: $($_.patternInfo.subCategory)`n" +
+                     "--------------------------------------`n"
+                     }
 
-# Join the array into a single string
-$output = $output -join "`n"
+                # Join the array into a single string
+                  $output = $output -join "`n"
 
 
                        # Bar Graph Part
