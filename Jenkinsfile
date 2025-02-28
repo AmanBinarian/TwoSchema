@@ -92,8 +92,9 @@ pipeline {
                script { 
                     withCredentials([usernamePassword(credentialsId: 'aws-credentials', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) { 
                         echo "Inisde Aws Login ECr"
+                          bat "aws s3 ls"
                         bat "${AWS_CLI_PATH} ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}" 
-                        bat "aws s3 ls"
+                      
                     } 
                 } 
             } 
