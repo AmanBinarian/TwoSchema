@@ -70,45 +70,27 @@ pipeline {
         }
 
         
-   stage('Send Email') {
+  stage('Send Email') {
             steps {
                 powershell '''
                 try {
-                    $smtpServer = "smtp.gmail.com"
-                    $smtpPort = 587
-                    $smtpUser = "studyproject9821@gmail.com"
-                    $smtpPass = $env:GMAIL_APP_PASSWORD
+                    $smtp = New-Object Net.Mail.SmtpClient("smtp.gmail.com", 587)
+                    $smtp.EnableSsl = $true
+                    $smtp.Credentials = New-Object System.Net.NetworkCredential("studyproject9821@gmail.com", $env:GMAIL_APP_PASSWORD)
 
-                    $from = "studyproject9821@gmail.com"
-                    $to = "aman.kumar@binarysemantics.com"
-                    $subject = "LGI Report : Codacy Issues Report"
-                    $body = "Attached is the Codacy issues report with error and warning analysis.\n\nDownload the HTML file to see the detailed report of errors and warnings in the form of a pie chart."
-
-                    # Attachments
-                    $attachments = @("codacy_issues.txt", "error_warning_count.txt", "chart.html")
-
-                    # Create Mail Message Object
                     $message = New-Object System.Net.Mail.MailMessage
-                    $message.From = $from
-                    $message.To.Add($to)
-                    $message.Subject = $subject
-                    $message.Body = $body
+                    $message.From = "studyproject9821@gmail.com"
+                    $message.To.Add("supradip.majumdar@binarysemantics.com")
+                    $message.Subject = "Codacy Issues Report"
+                    $message.Body = "Attached is the Codacy issues report with error and warning analysis."
 
-                    foreach ($file in $attachments) {
-                        $message.Attachments.Add((New-Object System.Net.Mail.Attachment($file)))
+                    @("codacy_issues.txt", "error_warning_count.txt", "chart.html") | ForEach-Object {
+                        $message.Attachments.Add((New-Object System.Net.Mail.Attachment($_)))
                     }
 
-                    # Configure SMTP Client
-                    $smtp = New-Object Net.Mail.SmtpClient($smtpServer, $smtpPort)
-                    $smtp.EnableSsl = $true
-                    $smtp.Credentials = New-Object System.Net.NetworkCredential($smtpUser, $smtpPass)
-
-                    # Send Email
                     $smtp.Send($message)
-
                     Write-Host "Email sent successfully."
-                }
-                catch {
+                } catch {
                     Write-Host "ERROR: Failed to send email."
                     Write-Host $_
                     exit 1
