@@ -93,7 +93,7 @@ pipeline {
                     withCredentials([usernamePassword(credentialsId: 'aws-credentials', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) { 
                         echo "Inisde Aws Login ECr"
                         bat "${AWS_CLI_PATH} ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}" 
-                         
+                        echo "login succedded to ecr successfully " 
                     } 
                 } 
             } 
@@ -101,6 +101,7 @@ pipeline {
 
         stage('Push Docker Image to AWS ECR') { 
             steps { 
+                echo "Pushing Docker Images to ECR " 
                 script { 
                     bat "docker push ${DOCKER_IMAGE}" 
                 } 
