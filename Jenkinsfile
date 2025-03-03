@@ -12,6 +12,10 @@ pipeline {
         ECR_REGISTRY = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com" 
         DOCKER_IMAGE = "${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}" 
         AWS_CLI_PATH = '"C:\\Program Files\\Amazon\\AWSCLIV2\\aws.exe"'
+        ECS_CLUSTER = 'mycluster'
+        ECS_SERVICE = 'my-ecs-service'
+        ECS_TASK_DEFINITION = 'my-task-def'
+        ECS_TASK_FAMILY = 'my-task-family'
     }
     stages {
         stage('Build') {
@@ -188,8 +192,46 @@ $output = $json.data | ForEach-Object {
                     bat "docker push ${DOCKER_IMAGE}" 
                 } 
             } 
-        } 
-          
+        }    
+
+        
+stage('Fetch Current Task Definition') {
+    steps {
+        script {
+            echo "Fetching current ECS task definition..."
+            bat "${AWS_CLI_PATH} ecs describe-task-definition --task-definition ${ECS_TASK_FAMILY} --query taskDefinition > task-definition.json"
+        }
+    }
+}
+stage('Update ECS Task Definition') {
+    steps {
+        script {
+            echo "Updating task definition with new image..."
+            bat """
+            jq 'del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities) |
+                (.containerDefinitions[0].image = "\\"${DOCKER_IMAGE}\\"")' task-definition.json > task-definition-updated.json
+            """
+        }
+    }
+}
+
+stage('Register New Task Definition') {
+    steps {
+        script {
+            echo "Registering new task definition..."
+            bat "${AWS_CLI_PATH} ecs register-task-definition --cli-input-json file://task-definition-updated.json"
+        }
+    }
+}
+stage('Deploy to ECS') {
+    steps {
+        script {
+            echo "Forcing ECS Service Deployment..."
+            bat "${AWS_CLI_PATH} ecs update-service --cluster ${ECS_CLUSTER} --service ${ECS_SERVICE} --force-new-deployment"
+        }
+    }
+}
+ 
 
     }
 }
