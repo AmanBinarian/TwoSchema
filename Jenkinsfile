@@ -15,7 +15,7 @@ pipeline {
         ECS_CLUSTER = 'mycluster'
         ECS_SERVICE = 'my-ecs-service'
         ECS_TASK_DEFINITION = 'my-task-def'
-        ECS_TASK_FAMILY = 'my-task-family'
+        ECS_TASK_FAMILY = 'my-task-def'
     }
     stages {
         stage('Build') {
