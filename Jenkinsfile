@@ -202,41 +202,43 @@ $output = $json.data | ForEach-Object {
             }
         }
 
-        stage('Update ECS Task Definition') {
-            steps {
-                script {
-                    echo "Updating task definition with new image..."
-                    powershell 'task_definition_update.ps1'
-                }
-            }
+      stage('Update ECS Task Definition') {
+    steps {
+        script {
+            echo "Updating task definition with new image..."
+            bat """
+            jq 'del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities) |
+                (.containerDefinitions[0].image = "\\"${DOCKER_IMAGE}\\"")' task-definition.json > task-definition-updated.json
+            """
         }
-
-        stage('Register New Task Definition') {
-            steps {
-                script {
-                    echo "Registering new task definition..."
-                    bat "${AWS_CLI_PATH} ecs register-task-definition --cli-input-json file://task-definition-updated.json"
-                }
-            }
-        }
-
-        stage('Deploy to ECS') {
-            steps {
-                script {
-                    echo "Forcing ECS Service Deployment..."
-                    bat "${AWS_CLI_PATH} ecs update-service --cluster ${ECS_CLUSTER} --service ${ECS_SERVICE} --force-new-deployment"
-                }
-            }
-        }
-
-        stage('Verify ECS Deployment') {
-            steps {
-                script {
-                    bat "${AWS_CLI_PATH} ecs describe-services --cluster ${ECS_CLUSTER} --services ${ECS_SERVICE}"
-                }
-            }
-        }
+    }
+}
         
+stage('Register New Task Definition') {
+    steps {
+        script {
+            echo "Registering new task definition..."
+            bat "${AWS_CLI_PATH} ecs register-task-definition --cli-input-json file://task-definition-updated.json"
+        }
+    }
+}
+        
+stage('Deploy to ECS') {
+    steps {
+        script {
+            echo "Forcing ECS Service Deployment..."
+            bat "${AWS_CLI_PATH} ecs update-service --cluster ${ECS_CLUSTER} --service ${ECS_SERVICE} --force-new-deployment"
+        }
+    }
+}
+        
+stage('Verify ECS Deployment') {
+    steps {
+        script {
+            bat "${AWS_CLI_PATH} ecs describe-services --cluster ${ECS_CLUSTER} --services ${ECS_SERVICE}"
+        }
+    }
+}
 
  
 
